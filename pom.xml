@@ -21,6 +21,7 @@
         <module>customer-service</module>
         <module>producer-service</module>
         <module>discovery-server</module>
+        <module>api-gateway</module>
     </modules>
 
     <properties>

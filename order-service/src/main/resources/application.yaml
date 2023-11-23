@@ -19,13 +19,13 @@ spring:
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: update
     properties:
       hibernate:
         format_sql: true
         show_sql: true
 
-
+  # Kafka Properties
   kafka:
     bootstrap-servers: localhost:9092
     template:
@@ -38,4 +38,4 @@ spring:
           json:
             type:
               mapping: event:app.snob.orderservice.event.OrderPlacedEvent
-  # Kafka Properties
+

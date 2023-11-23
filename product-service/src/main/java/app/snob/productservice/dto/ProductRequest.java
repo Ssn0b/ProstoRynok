@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 @Data
 @Builder
@@ -17,10 +18,11 @@ import java.util.Map;
 public class ProductRequest {
     private String name;
     private String skuCode;
+    private UUID producerId;
     private List<ProductCategory> categoryList;
     private String description;
     private int expirationDate; // термін зберігання в днях
-    private String photoUrl;
+    private List<String> photoUrl;
     private Map<String, Object> additionalFields;
     private Integer quantity;
     private BigDecimal priceByOne;

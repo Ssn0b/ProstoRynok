@@ -24,6 +24,7 @@ public class ProductService {
     public void createProduct(ProductRequest productRequest) {
         Product product = Product.builder()
                 .name(productRequest.getName())
+                .producerId(productRequest.getProducerId())
                 .skuCode(productRequest.getSkuCode())
                 .description(productRequest.getDescription())
                 .categoryList(productRequest.getCategoryList())
@@ -61,6 +62,7 @@ public class ProductService {
         return ProductResponse.builder()
                 .id(product.getId())
                 .name(product.getName())
+                .producerId(product.getProducerId())
                 .skuCode(product.getSkuCode())
                 .categoryList(product.getCategoryList())
                 .description(product.getDescription())

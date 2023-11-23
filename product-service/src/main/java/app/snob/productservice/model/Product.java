@@ -10,6 +10,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 @Document(value = "product")
 @AllArgsConstructor
@@ -21,10 +22,11 @@ public class Product {
     private String id;
     private String name;
     private String skuCode;
+    private UUID producerId;
     private List<ProductCategory> categoryList;
     private String description;
     private int expirationDate; // термін зберігання в днях
-    private String photoUrl; // @TODO implement s3
+    private List<String> photoUrl; // @TODO implement s3
     private Map<String, Object> additionalFields;
     private Integer quantity;
     private BigDecimal priceByOne;
