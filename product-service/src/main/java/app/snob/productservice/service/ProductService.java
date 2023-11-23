@@ -1,59 +1,74 @@
 package app.snob.productservice.service;
 
 import app.snob.productservice.dto.ProductRequest;
+import app.snob.productservice.dto.ProductResponse;
+import app.snob.productservice.event.OrderPlacedEvent;
 import app.snob.productservice.model.Product;
-import app.snob.productservice.model.coffee.Coffee;
-import app.snob.productservice.repository.CoffeeRepository;
+import app.snob.productservice.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class CoffeeService {
-    private final CoffeeRepository coffeeRepository;
+public class ProductService {
+    private final ProductRepository productRepository;
 
-    public void createCoffee(ProductRequest productRequest) {
+    public void createProduct(ProductRequest productRequest) {
         Product product = Product.builder()
                 .name(productRequest.getName())
+                .skuCode(productRequest.getSkuCode())
                 .description(productRequest.getDescription())
                 .categoryList(productRequest.getCategoryList())
                 .expirationDate(productRequest.getExpirationDate())
                 .photoUrl(productRequest.getPhotoUrl())
                 .additionalFields(productRequest.getAdditionalFields())
+                .quantity(productRequest.getQuantity())
+                .priceByOne(productRequest.getPriceByOne())
                 .build();
-
-        Coffee coffee = (Coffee) product;
-
-        coffee = Coffee.builder()
-                .coffeeType(coffeeRequest.getCoffeeType())
-                .grainOrigin(coffeeRequest.getGrainOrigin())
-                .build();
-
-        coffeeRepository.save(coffee);
-        log.info("Product {} is saved", coffee.getId());
+        productRepository.save(product);
+        log.info("Product {} is saved", product.getId());
     }
-    public List<CoffeeResponse> getAllCoffees(){
-        return coffeeRepository.findAll()
+
+    public List<ProductResponse> getAllProducts(){
+        return productRepository.findAll()
                 .stream()
                 .map(this::mapToProductResponse)
                 .collect(Collectors.toList());
     }
 
-    private CoffeeResponse mapToProductResponse(Coffee coffee){
-        return CoffeeResponse.builder()
-                .id(coffee.getId())
-                .name(coffee.getName())
-                .categoryList(coffee.getCategoryList())
-                .description(coffee.getDescription())
-                .expirationDate(coffee.getExpirationDate())
-                .photoUrl(coffee.getPhotoUrl())
-                .coffeeType(coffee.getCoffeeType())
-                .grainOrigin(coffee.getGrainOrigin())
+    @KafkaListener(topics = "notificationTopic")
+    public void handleNotification(OrderPlacedEvent orderPlacedEvent) {
+        Map<String, Integer> productsSkusAndQuantity = orderPlacedEvent.getProductsSkusAndQuantity();
+        Set<String> skus = productsSkusAndQuantity.keySet();
+        for (String sku : skus) {
+            log.info("Product with sku code quantity {} is updated", sku);
+            Integer quantity = productsSkusAndQuantity.get(sku);
+            Product product = productRepository.findBySkuCode(sku);
+            product.setQuantity(product.getQuantity()-quantity);
+            productRepository.save(product);
+        }
+    }
+
+    private ProductResponse mapToProductResponse(Product product){
+        return ProductResponse.builder()
+                .id(product.getId())
+                .name(product.getName())
+                .skuCode(product.getSkuCode())
+                .categoryList(product.getCategoryList())
+                .description(product.getDescription())
+                .expirationDate(product.getExpirationDate())
+                .photoUrl(product.getPhotoUrl())
+                .additionalFields(product.getAdditionalFields())
+                .priceByOne(product.getPriceByOne())
+                .quantity(product.getQuantity())
                 .build();
     }
 }

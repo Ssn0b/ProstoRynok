@@ -1,9 +1,8 @@
 package app.snob.productservice.model;
 
 import lombok.RequiredArgsConstructor;
-
 @RequiredArgsConstructor
-public enum Category {
+public enum ProductCategory {
     VEGETABLES("Vegetables"),
     FRUITS("Fruits"),
     TEA("Tea"),
